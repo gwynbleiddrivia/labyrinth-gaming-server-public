@@ -3,6 +3,7 @@ const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 5000
 
+const { MongoClient, ServerApiVersion } = require('mongodb');
 
 //middlewares here
 app.use(cors())
@@ -22,7 +23,6 @@ app.get('/',(req,res)=>{
 //MongoDB application code
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.c32luun.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -37,7 +37,34 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    client.connect();
+    
+    const userCollection = client.db('usersDB').collection('users')
+
+
+
+    app.get('/users', async(req,res)=>{
+	let query = {}
+	if (req.query?.email){
+		query = {email: req.query.email}
+	}
+	const result = await userCollection.find(query).toArray()
+	res.send(result)
+	console.log(result)
+    })
+
+
+
+
+
+    app.post('/users', async(req,res)=>{
+	const newUser = req.body
+	const result = await userCollection.insertOne(newUser)
+	res.send(result)
+	console.log(newUser)
+    })
+ 
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
