@@ -40,7 +40,7 @@ async function run() {
     client.connect();
     
     const userCollection = client.db('usersDB').collection('users')
-
+    const toyCollection = client.db('toysDB').collection('toys')
 
 
     app.get('/users', async(req,res)=>{
@@ -52,7 +52,16 @@ async function run() {
 	res.send(result)
 	console.log(result)
     })
-
+   
+   app.get('/toys', async(req,res)=>{
+	let query = {}
+	console.log(req.query)
+	if (req.query?.email){
+		query = {selleremail: req.query.email}
+	}
+	const result = await toyCollection.find(query).toArray()
+	res.send(result)
+    })
 
 
 
@@ -63,7 +72,15 @@ async function run() {
 	res.send(result)
 	console.log(newUser)
     })
- 
+
+    
+    app.post('/toys', async(req,res)=>{
+	const newToy = req.body
+	const result = await toyCollection.insertOne(newToy)
+	res.send(result)
+	console.log(newToy)
+    })
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
