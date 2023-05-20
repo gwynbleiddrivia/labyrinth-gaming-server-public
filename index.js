@@ -2,7 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 5000
-
+const ObjectId = require('mongodb').ObjectId;
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
 //middlewares here
@@ -62,7 +62,18 @@ async function run() {
 	const result = await toyCollection.find(query).toArray()
 	res.send(result)
     })
+    
+   app.get('/toys/:id', async(req,res)=>{
+	const id = req.params.id
+	console.log(id,"1st")
+	const query = {_id: new ObjectId(id)}
+	console.log(query,"2nd")
+	const result = await toyCollection.find(query).toArray()
+	console.log(result, "3rd")
+	res.send(result)
+    })
 
+    
 
 
 
