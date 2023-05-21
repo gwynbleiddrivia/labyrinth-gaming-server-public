@@ -6,6 +6,7 @@ const ObjectId = require('mongodb').ObjectId;
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
 //middlewares here
+
 app.use(cors())
 app.use(express.json())
 require('dotenv').config()
@@ -41,6 +42,27 @@ async function run() {
     
     const userCollection = client.db('usersDB').collection('users')
     const toyCollection = client.db('toysDB').collection('toys')
+
+//to update single toy info
+    app.put('/toys/:id', async(req,res)=>{
+    	app.use(cors())
+	const id = req.params.id
+	const updatedToy = req.body
+	const filter = {_id: new ObjectId(id)}
+	const options = {upsert: true}
+	const updatedInfo = {
+		$set:{
+			toyprice: updatedToy.toyprice,
+			quantity: updatedToy.quantity,
+			description: updatedToy.description
+		}
+	}
+	const result = await toyCollection.updateOne(filter, updatedInfo, options)
+	res.send(result)
+    })
+
+
+
 
 //to read all users info
     app.get('/users', async(req,res)=>{
@@ -85,7 +107,7 @@ async function run() {
 
 
 
-//to create user info
+//to add new user, create user info
     app.post('/users', async(req,res)=>{
 	const newUser = req.body
 	const result = await userCollection.insertOne(newUser)
@@ -93,7 +115,7 @@ async function run() {
 	console.log(newUser)
     })
 
-//to create toys info
+//to add new toy, create toy info
     app.post('/toys', async(req,res)=>{
 	const newToy = req.body
 	const result = await toyCollection.insertOne(newToy)
