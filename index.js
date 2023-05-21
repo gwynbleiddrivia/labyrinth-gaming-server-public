@@ -42,7 +42,7 @@ async function run() {
     const userCollection = client.db('usersDB').collection('users')
     const toyCollection = client.db('toysDB').collection('toys')
 
-
+//to read all users info
     app.get('/users', async(req,res)=>{
 	let query = {}
 	if (req.query?.email){
@@ -53,30 +53,39 @@ async function run() {
 	console.log(result)
     })
    
+
+//to read all toys info
    app.get('/toys', async(req,res)=>{
 	let query = {}
+	let sortquery = {}
 	console.log(req.query)
 	if (req.query?.email){
 		query = {selleremail: req.query.email}
 	}
-	const result = await toyCollection.find(query).toArray()
+	if(req.query?.ascended){
+		sortquery={'toyprice':1}
+	}
+	if(req.query?.descended){
+		sortquery={'toyprice':-1}
+	}
+	
+	const result = await toyCollection.find(query).sort(sortquery).toArray()
 	res.send(result)
     })
-    
+
+
+//to read single toy info    
    app.get('/toys/:id', async(req,res)=>{
 	const id = req.params.id
-	console.log(id,"1st")
 	const query = {_id: new ObjectId(id)}
-	console.log(query,"2nd")
 	const result = await toyCollection.find(query).toArray()
-	console.log(result, "3rd")
 	res.send(result)
     })
-
     
 
 
 
+//to create user info
     app.post('/users', async(req,res)=>{
 	const newUser = req.body
 	const result = await userCollection.insertOne(newUser)
@@ -84,7 +93,7 @@ async function run() {
 	console.log(newUser)
     })
 
-    
+//to create toys info
     app.post('/toys', async(req,res)=>{
 	const newToy = req.body
 	const result = await toyCollection.insertOne(newToy)
