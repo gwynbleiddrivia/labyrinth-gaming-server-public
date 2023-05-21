@@ -43,9 +43,19 @@ async function run() {
     const userCollection = client.db('usersDB').collection('users')
     const toyCollection = client.db('toysDB').collection('toys')
 
+//to delete a single toy info
+    app.delete('/toys/:id', async(req,res)=>{
+	const id = req.params.id
+	const query = {_id: new ObjectId(id)}
+	const result = await toyCollection.deleteOne(query)
+	res.send(result)
+
+    })
+
+
+
 //to update single toy info
     app.put('/toys/:id', async(req,res)=>{
-    	app.use(cors())
 	const id = req.params.id
 	const updatedToy = req.body
 	const filter = {_id: new ObjectId(id)}
